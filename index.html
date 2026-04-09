@@ -70,11 +70,55 @@
 
   <!-- JS -->
   <script src="js/main.js"></script>
+<script type="module">
+import { db } from "./js/firebase.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-function goCategory(name) {
-  window.location.href = `category.html?name=${name}`;
+const container = document.getElementById("featuredPrompts");
+
+async function loadPrompts() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "prompts"));
+
+    let prompts = [];
+
+    querySnapshot.forEach(doc => {
+      prompts.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    if (prompts.length === 0) {
+      container.innerHTML = "<p>No prompts yet.</p>";
+      return;
+    }
+
+    // Latest first
+    prompts.reverse().slice(0, 6).forEach(p => {
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        ${p.image ? `<img src="${p.image}" style="width:100%; border-radius:3px; margin-bottom:8px;">` : ""}
+        <h3>${p.title}</h3>
+        <p>${p.prompt.substring(0, 80)}...</p>
+      `;
+
+      div.addEventListener("click", () => {
+        window.location.href = `prompt.html?id=${p.id}`;
+      });
+
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Error loading prompts</p>";
+  }
 }
+
+loadPrompts();
 </script>
 </body>
 </html>
