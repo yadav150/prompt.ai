@@ -82,6 +82,7 @@ async function loadPrompts() {
     div.className = "card";
 
     div.innerHTML = `
+  ${p.image ? `<img src="${p.image}" style="width:100%; border-radius:3px; margin-bottom:8px;">` : ""}
   <h3>${p.title}</h3>
   <p>${p.prompt.substring(0, 80)}...</p>
 `;
