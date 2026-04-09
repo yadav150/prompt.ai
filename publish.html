@@ -82,30 +82,33 @@
 
   <script src="js/main.js"></script>
 
-  <script>
-    // BASIC FRONTEND SAVE (LOCAL STORAGE)
-    const form = document.getElementById("publishForm");
+  <script type="module">
+import { db } from "./js/firebase.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
+const form = document.getElementById("publishForm");
 
-      const data = {
-        title: document.getElementById("title").value,
-        category: document.getElementById("category").value,
-        prompt: document.getElementById("prompt").value,
-        description: document.getElementById("description").value
-      };
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
-      prompts.push(data);
+  const data = {
+    title: document.getElementById("title").value,
+    category: document.getElementById("category").value,
+    prompt: document.getElementById("prompt").value,
+    description: document.getElementById("description").value,
+    createdAt: serverTimestamp()
+  };
 
-      localStorage.setItem("prompts", JSON.stringify(prompts));
+  try {
+    await addDoc(collection(db, "prompts"), data);
+    alert("🔥 Prompt Published Successfully");
 
-      alert("Prompt Published Successfully 🚀");
-
-      form.reset();
-    });
-  </script>
+    form.reset();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+</script>
 
 </body>
 </html>
