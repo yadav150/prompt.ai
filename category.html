@@ -52,47 +52,61 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/
 const params = new URLSearchParams(window.location.search);
 const category = params.get("name");
 
-document.getElementById("categoryTitle").innerText = category || "All Prompts";
-
+const titleEl = document.getElementById("categoryTitle");
 const promptList = document.getElementById("promptList");
 
+titleEl.innerText = category || "All Prompts";
+
 async function loadPrompts() {
-  const querySnapshot = await getDocs(collection(db, "prompts"));
+  try {
+    // ✅ CLEAR OLD DATA (important)
+    promptList.innerHTML = "";
 
-  let prompts = [];
+    const querySnapshot = await getDocs(collection(db, "prompts"));
 
-  querySnapshot.forEach(doc => {
-  prompts.push({
-    id: doc.id,
-    ...doc.data()
-  });
-});
+    let prompts = [];
 
-  let filtered = category
-    ? prompts.filter(p => p.category === category)
-    : prompts;
+    querySnapshot.forEach(doc => {
+      prompts.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
 
-  if (filtered.length === 0) {
-    promptList.innerHTML = "<p>No prompts found.</p>";
-    return;
+    // ✅ FILTER
+    let filtered = category
+      ? prompts.filter(p => p.category === category)
+      : prompts;
+
+    // ✅ NO DATA
+    if (filtered.length === 0) {
+      promptList.innerHTML = "<p>No prompts found.</p>";
+      return;
+    }
+
+    // ✅ LATEST FIRST
+    filtered.reverse().forEach(p => {
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        ${p.image ? `<img src="${p.image}" style="width:100%; border-radius:3px; margin-bottom:8px;">` : ""}
+        <h3>${p.title}</h3>
+        <p>${p.prompt.substring(0, 80)}...</p>
+      `;
+
+      // ✅ CLICK NAVIGATION
+      div.addEventListener("click", () => {
+        window.location.href = `prompt.html?id=${p.id}`;
+      });
+
+      promptList.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error(err);
+    promptList.innerHTML = "<p>Error loading prompts</p>";
   }
-
-  filtered.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-  ${p.image ? `<img src="${p.image}" style="width:100%; border-radius:3px; margin-bottom:8px;">` : ""}
-  <h3>${p.title}</h3>
-  <p>${p.prompt.substring(0, 80)}...</p>
-`;
-
-div.addEventListener("click", () => {
-  window.location.href = `prompt.html?id=${p.id}`;
-});
-
-    promptList.appendChild(div);
-  });
 }
 
 loadPrompts();
