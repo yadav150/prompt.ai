@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Prompt.ai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div><b>Prompt.ai</b></div>
+</div>
+
+<div style="text-align:center; padding:50px;">
+  <h2>Login to Continue</h2>
+  <button onclick="googleLogin()" style="padding:12px 20px; cursor:pointer;">
+    Sign in with Google
+  </button>
+</div>
+
+<script type="module">
+import { googleLogin } from "./app.js";
+window.googleLogin = googleLogin;
+</script>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
