@@ -119,17 +119,28 @@ const form = document.getElementById("publishForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // TERMS CHECK
+  if (!document.getElementById("terms").checked) {
+    alert("Please accept terms");
+    return;
+  }
+
   const data = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
     title: document.getElementById("title").value,
     category: document.getElementById("category").value,
     prompt: document.getElementById("prompt").value,
     description: document.getElementById("description").value,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    likes: 0,
+    views: 0
   };
 
   try {
     await addDoc(collection(db, "prompts"), data);
-    alert("🔥 Prompt Published Successfully");
+
+    alert(" Prompt Published Successfully");
 
     form.reset();
   } catch (err) {
