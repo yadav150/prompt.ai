@@ -23,8 +23,7 @@
 import { auth } from "./firebase.js";
 import {
   GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const provider = new GoogleAuthProvider();
@@ -35,28 +34,14 @@ document.getElementById("googleLoginBtn").addEventListener("click", async () => 
 
     console.log("LOGIN SUCCESS:", result.user);
 
-    // redirect after login
     window.location.href = "index.html";
 
   } catch (error) {
     console.error("LOGIN ERROR:", error);
 
-    // popup blocked fallback
-    if (error.code === "auth/popup-blocked") {
-      await signInWithRedirect(auth, provider);
-    }
-
-    // unauthorized domain error
-    else if (error.code === "auth/unauthorized-domain") {
-      alert("❌ Add your domain in Firebase → Authentication → Authorized Domains");
-    }
-
-    else {
-      alert(error.message);
-    }
+    alert(error.code + "\n" + error.message);
   }
 });
 </script>
-
 </body>
 </html>
