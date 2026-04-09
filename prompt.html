@@ -64,17 +64,19 @@ button {
   </div>
 </div>
 
-<!-- FIREBASE (MODULAR SDK) -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 import {
   getFirestore,
   doc,
-  getDoc
+  getDoc,
+  updateDoc,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// 🔥 YOUR FIREBASE CONFIG (UPDATED)
+// 🔥 YOUR FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCDdHDWhC-JkJqBSNxKAd7dWwX8agBYuuc",
   authDomain: "prompt-ai-a0c21.firebaseapp.com",
@@ -115,12 +117,24 @@ async function loadPrompt() {
 
     const p = snap.data();
 
+    // 🔥 AUTO VIEWS SYSTEM
+    await updateDoc(ref, {
+      views: increment(1)
+    });
+
     content.innerHTML = `
       <h2>${p.title}</h2>
+
       <span class="tag">${p.category || "Uncategorized"}</span>
+
       <hr>
-      <p id="promptText" style="white-space:pre-wrap; line-height:1.5;">
+
+      <p style="white-space:pre-wrap; line-height:1.6;">
         ${p.prompt}
+      </p>
+
+      <p style="margin-top:10px; font-size:13px; color:gray;">
+        👁 Views: ${(p.views || 0) + 1}
       </p>
 
       <button onclick="copyPrompt()">Copy Prompt</button>
