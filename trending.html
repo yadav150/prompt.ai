@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trending Prompts</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: #f9fafb;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #facc15;
+  font-size: 12px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <h2>🔥 Trending Prompts</h2>
+</header>
+
+<div class="container">
+  <div class="grid" id="list"></div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// 🔥 YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCDdHDWhC-JkJQBSNxKAd7dWwX8agBYuuc",
+  authDomain: "prompt-ai-a0c21.firebaseapp.com",
+  projectId: "prompt-ai-a0c21",
+  storageBucket: "prompt-ai-a0c21.firebasestorage.app",
+  messagingSenderId: "322416217341",
+  appId: "1:322416217341:web:c43dcc16ac86bbba24c294",
+  measurementId: "G-B98ZKD5KP9"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const list = document.getElementById("list");
+
+let allData = [];
+
+async function loadTrending() {
+  const snap = await getDocs(collection(db, "prompts"));
+
+  allData = [];
+
+  snap.forEach(doc => {
+    allData.push({ id: doc.id, ...doc.data() });
+  });
+
+  render();
+}
+
+function render() {
+  list.innerHTML = "";
+
+  // SORT BY VIEWS (HIGH → LOW)
+  const sorted = allData.sort((a, b) => (b.views || 0) - (a.views || 0));
+
+  sorted.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <h3>${p.title}</h3>
+      <p>${p.prompt.substring(0, 80)}...</p>
+      <span class="badge">🔥 ${p.views || 0} views</span>
+    `;
+
+    div.onclick = () => {
+      window.location.href = `prompt.html?id=${p.id}`;
+    };
+
+    list.appendChild(div);
+  });
+}
+
+loadTrending();
+</script>
+
+</body>
+</html>
