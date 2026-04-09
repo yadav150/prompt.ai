@@ -12,17 +12,45 @@
 
 <div style="text-align:center; padding:50px;">
   <h2>Login to Continue</h2>
-  <button onclick="googleLogin()" style="padding:12px 20px; cursor:pointer;">
+
+  <button id="googleBtn"
+    style="padding:12px 20px; cursor:pointer;">
     Sign in with Google
   </button>
 </div>
 
+<!-- ONLY ONE MODULE SCRIPT -->
 <script type="module">
-import { googleLogin } from "./app.js";
-window.googleLogin = googleLogin;
-</script>
+import { auth } from "./firebase.js";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-<script type="module" src="app.js"></script>
+document.getElementById("googleBtn").addEventListener("click", async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+
+    const result = await signInWithPopup(auth, provider);
+
+    console.log("Login success:", result.user);
+
+    // redirect after login
+    window.location.href = "index.html";
+
+  } catch (error) {
+    console.error(error);
+
+    // fallback if popup blocked
+    if (error.code === "auth/popup-blocked") {
+      await signInWithRedirect(auth, new GoogleAuthProvider());
+    } else {
+      alert(error.message);
+    }
+  }
+});
+</script>
 
 </body>
 </html>
