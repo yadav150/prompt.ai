@@ -1,158 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Prompt View</title>
+<div id="content"></div>
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f9fafb;
-}
-
-header {
-  background: #111827;
-  color: white;
-  padding: 15px;
-  text-align: center;
-}
-
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-button {
-  margin-top: 15px;
-  padding: 10px;
-  border: none;
-  background: #111827;
-  color: white;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.tag {
-  display: inline-block;
-  padding: 4px 8px;
-  background: #e5e7eb;
-  font-size: 12px;
-  border-radius: 5px;
-  margin-top: 8px;
-}
-</style>
-
-</head>
-<body>
-
-<header>
-  <h2>Prompt Details</h2>
-</header>
-
-<div class="container">
-  <div class="card" id="content">
-    Loading prompt...
-  </div>
-</div>
-
-<!-- FIREBASE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  increment
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getPrompt } from "./app.js";
 
-// 🔥 YOUR FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyCDdHDWhC-JkJqBSNxKAd7dWwX8agBYuuc",
-  authDomain: "prompt-ai-a0c21.firebaseapp.com",
-  projectId: "prompt-ai-a0c21",
-  storageBucket: "prompt-ai-a0c21.firebasestorage.app",
-  messagingSenderId: "322416217341",
-  appId: "1:322416217341:web:c43dcc16ac86bbba24c294",
-  measurementId: "G-B98ZKD5KP9"
+const id = new URLSearchParams(location.search).get("id");
+const data = await getPrompt(id);
+
+document.getElementById("content").innerHTML = `
+  <h1>${data.title}</h1>
+  <p><b>${data.userEmail}</b></p>
+  <pre style="white-space:pre-wrap">${data.prompt}</pre>
+  <button onclick="copy()">Copy</button>
+`;
+
+window.copy = ()=>{
+  navigator.clipboard.writeText(data.prompt);
 };
-
-// INIT
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-
-// UI
-const content = document.getElementById("content");
-
-// GET ID FROM URL
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-// LOAD PROMPT
-async function loadPrompt() {
-  if (!id) {
-    content.innerHTML = "<h3>No prompt ID found!</h3>";
-    return;
-  }
-
-  try {
-    const ref = doc(db, "prompts", id);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      content.innerHTML = "<h3>Prompt not found!</h3>";
-      return;
-    }
-
-    const p = snap.data();
-
-    // 🔥 AUTO VIEWS SYSTEM
-    await updateDoc(ref, {
-      views: increment(1)
-    });
-
-    content.innerHTML = `
-      <h2>${p.title}</h2>
-
-      <span class="tag">${p.category || "Uncategorized"}</span>
-
-      <hr>
-
-      <p style="white-space:pre-wrap; line-height:1.6;">
-        ${p.prompt}
-      </p>
-
-      <p style="margin-top:10px; font-size:13px; color:gray;">
-        👁 Views: ${(p.views || 0) + 1}
-      </p>
-
-      <button onclick="copyPrompt()">Copy Prompt</button>
-    `;
-
-    window.copyPrompt = function () {
-      navigator.clipboard.writeText(p.prompt);
-      alert("Prompt copied!");
-    };
-
-  } catch (error) {
-    console.error(error);
-    content.innerHTML = "<h3>Error loading prompt</h3>";
-  }
-}
-
-loadPrompt();
 </script>
-
-</body>
-</html>
