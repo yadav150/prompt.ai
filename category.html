@@ -62,8 +62,11 @@ async function loadPrompts() {
   let prompts = [];
 
   querySnapshot.forEach(doc => {
-    prompts.push(doc.data());
+  prompts.push({
+    id: doc.id,
+    ...doc.data()
   });
+});
 
   let filtered = category
     ? prompts.filter(p => p.category === category)
@@ -79,9 +82,13 @@ async function loadPrompts() {
     div.className = "card";
 
     div.innerHTML = `
-      <h3>${p.title}</h3>
-      <p>${p.prompt.substring(0, 80)}...</p>
-    `;
+  <h3>${p.title}</h3>
+  <p>${p.prompt.substring(0, 80)}...</p>
+`;
+
+div.addEventListener("click", () => {
+  window.location.href = `prompt.html?id=${p.id}`;
+});
 
     promptList.appendChild(div);
   });
