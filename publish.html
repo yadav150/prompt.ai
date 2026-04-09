@@ -33,42 +33,70 @@
 
       <form id="publishForm" class="card">
 
-        <!-- TITLE -->
-        <div style="margin-bottom:15px;">
-          <label>Prompt Title</label>
-          <input type="text" id="title" required />
-        </div>
+  <!-- NAME -->
+  <div class="form-group">
+    <label>Your Name *</label>
+    <input type="text" id="name" required placeholder="Enter your name" />
+  </div>
 
-        <!-- CATEGORY -->
-        <div style="margin-bottom:15px;">
-          <label>Category</label>
-          <select id="category" required>
-            <option value="">Select Category</option>
-            <option>Image Generation</option>
-            <option>Writing</option>
-            <option>Coding</option>
-            <option>Marketing</option>
-          </select>
-        </div>
+  <!-- EMAIL -->
+  <div class="form-group">
+    <label>Email (optional)</label>
+    <input type="email" id="email" placeholder="Enter your email" />
+  </div>
 
-        <!-- PROMPT -->
-        <div style="margin-bottom:15px;">
-          <label>Prompt</label>
-          <textarea id="prompt" rows="5" required></textarea>
-        </div>
+  <!-- TITLE -->
+  <div class="form-group">
+    <label>Title *</label>
+    <input type="text" id="title" required placeholder="Enter prompt title" />
+  </div>
 
-        <!-- DESCRIPTION -->
-        <div style="margin-bottom:15px;">
-          <label>Description</label>
-          <textarea id="description" rows="4"></textarea>
-        </div>
+  <!-- CATEGORY -->
+  <div class="form-group">
+    <label>Category *</label>
+    <select id="category" required>
+      <option value="">Select Category</option>
+      <option>Image Generation</option>
+      <option>Writing</option>
+      <option>Coding</option>
+      <option>Marketing</option>
+    </select>
+  </div>
 
-        <!-- SUBMIT -->
-        <button type="submit" class="btn-primary" style="width:100%;">
-          Publish Prompt
-        </button>
+  <!-- PROMPT -->
+  <div class="form-group">
+    <label>Prompt *</label>
+    <textarea id="prompt" rows="5" required placeholder="Write your prompt here..."></textarea>
+  </div>
 
-      </form>
+  <!-- DESCRIPTION -->
+  <div class="form-group">
+    <label>Description</label>
+    <textarea id="description" rows="4" placeholder="Optional description..."></textarea>
+  </div>
+
+  <!-- IMAGE UPLOAD -->
+  <div class="form-group">
+    <label>Upload Image (optional)</label>
+    <input type="file" id="image" accept="image/*" />
+  </div>
+
+  <!-- TERMS -->
+  <div class="form-group checkbox">
+    <input type="checkbox" id="terms" required />
+    <label for="terms">
+      I confirm this prompt is created by me, not copyrighted,
+      and I agree to the terms & privacy. If found copied,
+      Prompt.ai can remove it.
+    </label>
+  </div>
+
+  <!-- SUBMIT -->
+  <button type="submit" class="btn-primary" style="width:100%;">
+    Publish Prompt
+  </button>
+
+</form>
 
     </div>
   </section>
