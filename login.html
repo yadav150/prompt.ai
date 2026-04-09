@@ -13,13 +13,12 @@
 <div style="text-align:center; padding:50px;">
   <h2>Login to Continue</h2>
 
-  <button id="googleBtn"
-    style="padding:12px 20px; cursor:pointer;">
+  <button id="googleLoginBtn"
+    style="padding:12px 20px; cursor:pointer; font-size:16px;">
     Sign in with Google
   </button>
 </div>
 
-<!-- ONLY ONE MODULE SCRIPT -->
 <script type="module">
 import { auth } from "./firebase.js";
 import {
@@ -28,24 +27,31 @@ import {
   signInWithRedirect
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-document.getElementById("googleBtn").addEventListener("click", async () => {
-  try {
-    const provider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 
+document.getElementById("googleLoginBtn").addEventListener("click", async () => {
+  try {
     const result = await signInWithPopup(auth, provider);
 
-    console.log("Login success:", result.user);
+    console.log("LOGIN SUCCESS:", result.user);
 
     // redirect after login
     window.location.href = "index.html";
 
   } catch (error) {
-    console.error(error);
+    console.error("LOGIN ERROR:", error);
 
-    // fallback if popup blocked
+    // popup blocked fallback
     if (error.code === "auth/popup-blocked") {
-      await signInWithRedirect(auth, new GoogleAuthProvider());
-    } else {
+      await signInWithRedirect(auth, provider);
+    }
+
+    // unauthorized domain error
+    else if (error.code === "auth/unauthorized-domain") {
+      alert("❌ Add your domain in Firebase → Authentication → Authorized Domains");
+    }
+
+    else {
       alert(error.message);
     }
   }
