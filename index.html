@@ -1,153 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prompt.ai - Discover & Share AI Prompts</title>
+<meta charset="UTF-8">
+<title>Prompt Hub</title>
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: #f9fafb;
+}
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: #f9fafb;
-    }
+header {
+  background: #111827;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
 
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-      background: white;
-    }
+.container {
+  padding: 20px;
+}
 
-    .hero h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
+input, textarea, select, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
 
-    .hero p {
-      color: #6b7280;
-      font-size: 16px;
-    }
+button {
+  background: #111827;
+  color: white;
+  cursor: pointer;
+}
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
+.card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
 
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: 0.2s;
-    }
+.tag {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #e5e7eb;
+  font-size: 12px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+</style>
 
-    .card:hover {
-      transform: translateY(-3px);
-    }
-
-    .category-box {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-      justify-content: center;
-    }
-
-    .category {
-      padding: 8px 14px;
-      background: #e5e7eb;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .category:hover {
-      background: #d1d5db;
-    }
-  </style>
 </head>
-
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <h1>Discover & Share AI Prompts</h1>
-  <p>Find viral AI prompts or publish your own</p>
+<header>
+  <h1>Prompt Hub</h1>
+</header>
 
-  <div class="category-box">
-    <div class="category" onclick="openCat('Image Generation')">Image</div>
-    <div class="category" onclick="openCat('Writing')">Writing</div>
-    <div class="category" onclick="openCat('Coding')">Coding</div>
-    <div class="category" onclick="openCat('Marketing')">Marketing</div>
-  </div>
-</section>
+<div class="container">
 
-<!-- PROMPTS -->
-<section class="container">
-  <h2>🔥 Latest Prompts</h2>
-  <div id="promptList" class="grid"></div>
-</section>
+<!-- SEARCH -->
+<input id="searchInput" placeholder="Search prompts...">
 
+<!-- SUBMIT FORM -->
+<h2>Submit Prompt</h2>
+
+<form id="submitForm">
+  <input id="title" placeholder="Title" required>
+  <textarea id="prompt" placeholder="Write prompt..." required></textarea>
+
+  <select id="category">
+    <option>AI</option>
+    <option>Art</option>
+    <option>Writing</option>
+    <option>Coding</option>
+  </select>
+
+  <input id="image" placeholder="Image URL (optional)">
+
+  <button type="submit">Submit</button>
+</form>
+
+<!-- FEATURED -->
+<h2>Featured</h2>
+<div class="grid" id="featured"></div>
+
+<!-- ALL PROMPTS -->
+<h2>Latest Prompts</h2>
+<div class="grid" id="list"></div>
+
+</div>
+
+<!-- FIREBASE -->
 <script type="module">
-import { db } from "./js/firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  orderBy,
+  query
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const promptList = document.getElementById("promptList");
+// 🔥 YOUR FIREBASE CONFIG (PASTE YOURS HERE)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-// OPEN CATEGORY
-window.openCat = function(category) {
-  window.location.href = `category.html?name=${category}`;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ELEMENTS
+const form = document.getElementById("submitForm");
+const list = document.getElementById("list");
+const featured = document.getElementById("featured");
+const searchInput = document.getElementById("searchInput");
+
+// DATA STORE
+let allData = [];
+
+// SUBMIT PROMPT
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  await addDoc(collection(db, "prompts"), {
+    title: title.value,
+    prompt: prompt.value,
+    category: category.value,
+    image: image.value || "",
+    created: Date.now()
+  });
+
+  alert("Prompt Submitted!");
+  form.reset();
+  loadData();
+});
+
+// LOAD DATA
+async function loadData() {
+  const q = query(collection(db, "prompts"), orderBy("created", "desc"));
+  const snap = await getDocs(q);
+
+  allData = [];
+
+  snap.forEach(doc => {
+    allData.push({ id: doc.id, ...doc.data() });
+  });
+
+  render(allData);
 }
 
-// LOAD PROMPTS
-async function loadPrompts() {
-  try {
-    const snap = await getDocs(collection(db, "prompts"));
+// RENDER
+function render(data) {
+  list.innerHTML = "";
+  featured.innerHTML = "";
 
-    let prompts = [];
+  data.forEach((p, i) => {
 
-    snap.forEach(doc => {
-      prompts.push({ id: doc.id, ...doc.data() });
-    });
+    const card = document.createElement("div");
+    card.className = "card";
 
-    prompts.reverse().forEach(p => {
-      const div = document.createElement("div");
-      div.className = "card";
+    card.innerHTML = `
+      <h3>${p.title}</h3>
+      <p>${p.prompt.substring(0, 80)}...</p>
+      <span class="tag">${p.category}</span>
+    `;
 
-      div.innerHTML = `
-        ${p.image ? `<img src="${p.image}" style="width:100%; border-radius:6px; margin-bottom:10px;">` : ""}
-        <h3>${p.title}</h3>
-        <p style="color:#6b7280; font-size:14px;">
-          ${p.prompt.substring(0, 80)}...
-        </p>
-      `;
+    card.onclick = () => {
+      alert(p.prompt);
+    };
 
-      div.onclick = () => {
-        window.location.href = `prompt.html?id=${p.id}`;
-      };
+    list.appendChild(card);
 
-      promptList.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    promptList.innerHTML = "<p>Error loading prompts</p>";
-  }
+    // Featured (first 3)
+    if (i < 3) {
+      const f = card.cloneNode(true);
+      featured.appendChild(f);
+    }
+  });
 }
 
-loadPrompts();
+// SEARCH
+searchInput.addEventListener("input", (e) => {
+  const val = e.target.value.toLowerCase();
+
+  const filtered = allData.filter(p =>
+    p.title.toLowerCase().includes(val) ||
+    p.prompt.toLowerCase().includes(val)
+  );
+
+  render(filtered);
+});
+
+loadData();
+
 </script>
 
 </body>
