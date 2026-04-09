@@ -89,3 +89,8 @@ export async function getPrompt(id){
 
   return snap.data();
 }
+export function requireAuth(){
+  if(!currentUser){
+    location.href = "login.html";
+  }
+}
