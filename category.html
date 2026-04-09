@@ -45,39 +45,50 @@
 
   <script src="js/main.js"></script>
 
-  <script>
-    // GET CATEGORY FROM URL
-    const params = new URLSearchParams(window.location.search);
-    const category = params.get("name");
+  <script type="module">
+import { db } from "./js/firebase.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    document.getElementById("categoryTitle").innerText = category || "All Prompts";
+const params = new URLSearchParams(window.location.search);
+const category = params.get("name");
 
-    const promptList = document.getElementById("promptList");
+document.getElementById("categoryTitle").innerText = category || "All Prompts";
 
-    let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+const promptList = document.getElementById("promptList");
 
-    // FILTER
-    let filtered = category
-      ? prompts.filter(p => p.category === category)
-      : prompts;
+async function loadPrompts() {
+  const querySnapshot = await getDocs(collection(db, "prompts"));
 
-    // DISPLAY
-    if (filtered.length === 0) {
-      promptList.innerHTML = "<p>No prompts found.</p>";
-    } else {
-      filtered.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "card";
+  let prompts = [];
 
-        div.innerHTML = `
-          <h3>${p.title}</h3>
-          <p>${p.prompt.substring(0, 80)}...</p>
-        `;
+  querySnapshot.forEach(doc => {
+    prompts.push(doc.data());
+  });
 
-        promptList.appendChild(div);
-      });
-    }
-  </script>
+  let filtered = category
+    ? prompts.filter(p => p.category === category)
+    : prompts;
+
+  if (filtered.length === 0) {
+    promptList.innerHTML = "<p>No prompts found.</p>";
+    return;
+  }
+
+  filtered.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <h3>${p.title}</h3>
+      <p>${p.prompt.substring(0, 80)}...</p>
+    `;
+
+    promptList.appendChild(div);
+  });
+}
+
+loadPrompts();
+</script>
 
 </body>
 </html>
