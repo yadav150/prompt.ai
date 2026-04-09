@@ -1,151 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prompt Details - Prompt.ai</title>
+<meta charset="UTF-8">
+<title>Prompt View</title>
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9fafb;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  border: none;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #e5e7eb;
+  font-size: 12px;
+  border-radius: 5px;
+  margin-top: 8px;
+}
+</style>
+
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="container nav-container">
-      <div class="logo">Prompt.ai</div>
+<header>
+  <h2>Prompt Details</h2>
+</header>
 
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html">Home</a>
-        <a href="category.html">Categories</a>
-        <a href="publish.html">Publish</a>
-      </nav>
+<div class="container">
+  <div class="card" id="content">
+    Loading prompt...
+  </div>
+</div>
 
-      <div class="menu-toggle" id="menuToggle">☰</div>
-    </div>
-  </header>
-
-  <!-- PROMPT CONTENT -->
-  <section class="section">
-    <div class="container">
-
-      <!-- TITLE -->
-      <h1 id="title" style="margin-bottom:10px;"></h1>
-      <!-- META -->
-      <p style="color:#6b7280; font-size:14px; margin-bottom:20px;">
-        Category: Image Generation • By Admin • 2k views
-      </p>
-
-      <!-- IMAGE (ADD HERE) -->
-<img id="promptImage"
-     style="width:100%; border-radius:3px; margin-bottom:20px; display:none;" />
-      
-      <!-- PROMPT BOX -->
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="margin-bottom:10px;">Prompt</h3>
-        <p id="promptText" style="font-size:14px; line-height:1.6;"></p>
-      </div>
-
-      <!-- ACTIONS -->
-      <div style="display:flex; gap:10px; margin-bottom:30px;">
-        <button class="btn-primary">Copy Prompt</button>
-        <button class="btn-primary" style="background:#e5e7eb; color:#111827;">
-          Like
-        </button>
-      </div>
-
-      <!-- DESCRIPTION -->
-      <div class="card" style="margin-bottom:20px;">
-        <h3 style="margin-bottom:10px;">Description</h3>
-        <p id="descText" style="font-size:14px; color:#6b7280; line-height:1.6;"></p>
-      </div>
-
-      <!-- RELATED PROMPTS -->
-      <div>
-        <h2 class="section-title">Related Prompts</h2>
-
-        <div class="grid">
-          <div class="card">
-            <h3>Emotional Shiva Parvati Prompt</h3>
-            <p>Soft emotional divine scene with glowing aura...</p>
-          </div>
-
-          <div class="card">
-            <h3>Viral Reel Script Prompt</h3>
-            <p>Create engaging short-form content instantly...</p>
-          </div>
-
-          <div class="card">
-            <h3>Productivity AI Prompt</h3>
-            <p>Organize tasks and boost efficiency...</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <p>© 2026 Prompt.ai — Built for creators</p>
-    </div>
-  </footer>
-
-  <script src="js/main.js"></script>
+<!-- FIREBASE (MODULAR SDK) -->
 <script type="module">
-import { db } from "./js/firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// 🔥 YOUR FIREBASE CONFIG (UPDATED)
+const firebaseConfig = {
+  apiKey: "AIzaSyCDdHDWhC-JkJqBSNxKAd7dWwX8agBYuuc",
+  authDomain: "prompt-ai-a0c21.firebaseapp.com",
+  projectId: "prompt-ai-a0c21",
+  storageBucket: "prompt-ai-a0c21.firebasestorage.app",
+  messagingSenderId: "322416217341",
+  appId: "1:322416217341:web:c43dcc16ac86bbba24c294",
+  measurementId: "G-B98ZKD5KP9"
+};
+
+// INIT
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// UI
+const content = document.getElementById("content");
+
+// GET ID FROM URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-const titleEl = document.getElementById("title");
-const promptEl = document.getElementById("promptText");
-const descEl = document.getElementById("descText");
-const imgEl = document.getElementById("promptImage");
-
+// LOAD PROMPT
 async function loadPrompt() {
   if (!id) {
-    titleEl.innerText = "No prompt selected";
+    content.innerHTML = "<h3>No prompt ID found!</h3>";
     return;
   }
 
   try {
-    const docRef = doc(db, "prompts", id);
-    const docSnap = await getDoc(docRef);
+    const ref = doc(db, "prompts", id);
+    const snap = await getDoc(ref);
 
-    if (!docSnap.exists()) {
-      titleEl.innerText = "Prompt not found";
+    if (!snap.exists()) {
+      content.innerHTML = "<h3>Prompt not found!</h3>";
       return;
     }
 
-    const data = docSnap.data();
+    const p = snap.data();
 
-    // TITLE
-    titleEl.innerText = data.title || "Untitled";
+    content.innerHTML = `
+      <h2>${p.title}</h2>
+      <span class="tag">${p.category || "Uncategorized"}</span>
+      <hr>
+      <p id="promptText" style="white-space:pre-wrap; line-height:1.5;">
+        ${p.prompt}
+      </p>
 
-    // PROMPT
-    promptEl.innerText = data.prompt || "";
+      <button onclick="copyPrompt()">Copy Prompt</button>
+    `;
 
-    // DESCRIPTION
-    descEl.innerText = data.description || "No description available";
+    window.copyPrompt = function () {
+      navigator.clipboard.writeText(p.prompt);
+      alert("Prompt copied!");
+    };
 
-    // IMAGE (IMPORTANT FIX 🔥)
-    if (data.image) {
-      imgEl.src = data.image;
-      imgEl.style.display = "block";
-    } else {
-      imgEl.style.display = "none";
-    }
-
-  } catch (err) {
-    console.error(err);
-    titleEl.innerText = "Error loading prompt";
+  } catch (error) {
+    console.error(error);
+    content.innerHTML = "<h3>Error loading prompt</h3>";
   }
 }
 
 loadPrompt();
 </script>
+
 </body>
 </html>
