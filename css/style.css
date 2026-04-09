@@ -201,3 +201,4 @@ body {
     display: block;
   }
 }
+/* FORM IMPROVEMENTS */.form-group{margin-bottom:15px;display:flex;flex-direction:column}.form-group label{font-size:13px;margin-bottom:5px;color:var(--light-text)}.form-group input,.form-group select,.form-group textarea{padding:10px;border:1px solid var(--border);border-radius:3px;font-size:14px;outline:none}.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--primary)}/* CHECKBOX */.checkbox{flex-direction:row;align-items:flex-start;gap:10px}.checkbox input{margin-top:4px}
