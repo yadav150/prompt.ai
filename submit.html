@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Submit Prompt</h2>
+
+<input id="title" placeholder="Title"><br><br>
+<textarea id="prompt" placeholder="Prompt"></textarea><br><br>
+
+<select id="category">
+  <option>AI</option>
+  <option>Marketing</option>
+  <option>Coding</option>
+</select>
+
+<br><br>
+<button onclick="submit()">Submit</button>
+
+<script type="module">
+import { submitPrompt } from "./app.js";
+
+window.submit = ()=>{
+  submitPrompt(
+    document.getElementById("title").value,
+    document.getElementById("prompt").value,
+    document.getElementById("category").value
+  );
+};
+</script>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
