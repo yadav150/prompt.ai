@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publish Prompt - Prompt.ai</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="logo">Prompt.ai</div>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="#">Categories</a>
+        <a href="#">Publish</a>
+      </nav>
+
+      <div class="menu-toggle" id="menuToggle">☰</div>
+    </div>
+  </header>
+
+  <!-- FORM SECTION -->
+  <section class="section">
+    <div class="container" style="max-width:600px;">
+
+      <h1 style="margin-bottom:20px;">Publish Your Prompt</h1>
+
+      <form id="publishForm" class="card">
+
+        <!-- TITLE -->
+        <div style="margin-bottom:15px;">
+          <label>Prompt Title</label>
+          <input type="text" id="title" required />
+        </div>
+
+        <!-- CATEGORY -->
+        <div style="margin-bottom:15px;">
+          <label>Category</label>
+          <select id="category" required>
+            <option value="">Select Category</option>
+            <option>Image Generation</option>
+            <option>Writing</option>
+            <option>Coding</option>
+            <option>Marketing</option>
+          </select>
+        </div>
+
+        <!-- PROMPT -->
+        <div style="margin-bottom:15px;">
+          <label>Prompt</label>
+          <textarea id="prompt" rows="5" required></textarea>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div style="margin-bottom:15px;">
+          <label>Description</label>
+          <textarea id="description" rows="4"></textarea>
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="btn-primary" style="width:100%;">
+          Publish Prompt
+        </button>
+
+      </form>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Prompt.ai — Built for creators</p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+
+  <script>
+    // BASIC FRONTEND SAVE (LOCAL STORAGE)
+    const form = document.getElementById("publishForm");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const data = {
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        prompt: document.getElementById("prompt").value,
+        description: document.getElementById("description").value
+      };
+
+      let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+      prompts.push(data);
+
+      localStorage.setItem("prompts", JSON.stringify(prompts));
+
+      alert("Prompt Published Successfully 🚀");
+
+      form.reset();
+    });
+  </script>
+
+</body>
+</html>
