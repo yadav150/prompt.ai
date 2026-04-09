@@ -1,19 +1,56 @@
-<div id="content"></div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prompt View</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div><b>Prompt.ai</b></div>
+  <div><a href="index.html">Home</a></div>
+</div>
+
+<div id="content" style="padding:20px;"></div>
 
 <script type="module">
-import { getPrompt } from "./app.js";
+import { db } from "./firebase.js";
+import { doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const id = new URLSearchParams(location.search).get("id");
-const data = await getPrompt(id);
+
+const ref = doc(db, "prompts", id);
+const snap = await getDoc(ref);
+
+await updateDoc(ref, {
+  views: increment(1)
+});
+
+const data = snap.data();
 
 document.getElementById("content").innerHTML = `
   <h1>${data.title}</h1>
-  <p><b>${data.userEmail}</b></p>
-  <pre style="white-space:pre-wrap">${data.prompt}</pre>
-  <button onclick="copy()">Copy</button>
+  <p><b>Category:</b> ${data.category}</p>
+  <p><b>By:</b> ${data.userEmail}</p>
+
+  <pre style="
+    background:#fff;
+    padding:15px;
+    border-radius:8px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    white-space:pre-wrap;
+  ">${data.prompt}</pre>
+
+  <button onclick="copyPrompt()" style="margin-top:10px;padding:10px;">
+    Copy Prompt
+  </button>
 `;
 
-window.copy = ()=>{
+window.copyPrompt = () => {
   navigator.clipboard.writeText(data.prompt);
+  alert("Copied!");
 };
 </script>
+
+</body>
+</html>
