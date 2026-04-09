@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// YOUR CONFIG (same rakha hai)
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCCdHDWh-CJkJqBSNxKAd7dWwX8agBYuuc",
   authDomain: "prompt-ai-a0c21.firebaseapp.com",
@@ -13,8 +13,8 @@ const firebaseConfig = {
   measurementId: "G-B98ZKD5KP9"
 };
 
-// INIT FIREBASE
+// INIT (ONLY ONCE)
 const app = initializeApp(firebaseConfig);
 
-// EXPORT FIRESTORE
+// EXPORT
 export const db = getFirestore(app);
