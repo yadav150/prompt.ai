@@ -1,24 +1,48 @@
-<h2>My Dashboard</h2>
-<div id="my"></div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - Prompt.ai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div><b>Prompt.ai</b></div>
+  <div><a href="index.html">Home</a></div>
+</div>
+
+<h2 style="padding:20px;">My Dashboard</h2>
+
+<div id="myPrompts" class="grid"></div>
 
 <script type="module">
 import { auth, db } from "./firebase.js";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-auth.onAuthStateChanged(async user=>{
-  if(!user) location.href="login.html";
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
 
-  const q = query(collection(db,"prompts"), where("userId","==",user.uid));
+  const q = query(collection(db, "prompts"), where("userId", "==", user.uid));
   const snap = await getDocs(q);
 
-  snap.forEach(d=>{
-    document.getElementById("my").innerHTML += `
+  const container = document.getElementById("myPrompts");
+
+  snap.forEach(doc => {
+    const p = doc.data();
+
+    container.innerHTML += `
       <div class="card">
-        <h3>${d.data().title}</h3>
-        <p>${d.data().category}</p>
-        <small>Views: ${d.data().views}</small>
+        <h3>${p.title}</h3>
+        <p>${p.category}</p>
+        <small>👁 ${p.views} views</small>
       </div>
     `;
   });
 });
 </script>
+
+</body>
+</html>
