@@ -93,21 +93,18 @@
   </footer>
 
   <script src="js/main.js"></script>
-
-  <script type="module">
+<script type="module">
 import { db } from "./js/firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// GET ID FROM URL
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-// GET ELEMENTS
 const titleEl = document.getElementById("title");
 const promptEl = document.getElementById("promptText");
 const descEl = document.getElementById("descText");
+const imgEl = document.getElementById("promptImage");
 
-// LOAD DATA FROM FIREBASE
 async function loadPrompt() {
   if (!id) {
     titleEl.innerText = "No prompt selected";
@@ -118,18 +115,33 @@ async function loadPrompt() {
     const docRef = doc(db, "prompts", id);
     const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      titleEl.innerText = data.title;
-      promptEl.innerText = data.prompt;
-      descEl.innerText = data.description || "No description available";
-    } else {
+    if (!docSnap.exists()) {
       titleEl.innerText = "Prompt not found";
+      return;
     }
+
+    const data = docSnap.data();
+
+    // TITLE
+    titleEl.innerText = data.title || "Untitled";
+
+    // PROMPT
+    promptEl.innerText = data.prompt || "";
+
+    // DESCRIPTION
+    descEl.innerText = data.description || "No description available";
+
+    // IMAGE (IMPORTANT FIX 🔥)
+    if (data.image) {
+      imgEl.src = data.image;
+      imgEl.style.display = "block";
+    } else {
+      imgEl.style.display = "none";
+    }
+
   } catch (err) {
-    titleEl.innerText = "Error loading prompt";
     console.error(err);
+    titleEl.innerText = "Error loading prompt";
   }
 }
 
